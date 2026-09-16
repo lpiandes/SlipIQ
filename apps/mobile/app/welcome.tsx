@@ -16,18 +16,18 @@ export default function WelcomeScreen() {
   }
 
   if (!session) {
-    return <Redirect href="/sign-up" />;
+    return <Redirect href="/sign-in" />;
   }
 
   async function handleSignOut() {
     await supabase.auth.signOut();
-    router.replace('/sign-up');
+    router.replace('/sign-in');
   }
 
   return (
     <View style={styles.container}>
       <View style={styles.badge}>
-        <Text style={styles.badgeText}>Account created</Text>
+        <Text style={styles.badgeText}>Signed in</Text>
       </View>
       <Text style={styles.title}>Welcome to SlipIQ</Text>
       <Text style={styles.subtitle}>

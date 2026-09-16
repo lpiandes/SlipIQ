@@ -4,6 +4,11 @@ export interface SignUpFields {
   confirmPassword: string;
 }
 
+export interface SignInFields {
+  email: string;
+  password: string;
+}
+
 export interface FieldErrors {
   email?: string;
   password?: string;
@@ -54,6 +59,21 @@ export function validateSignUpForm(fields: SignUpFields): FieldErrors {
   return errors;
 }
 
+export function validateSignInForm(fields: SignInFields): FieldErrors {
+  const errors: FieldErrors = {};
+
+  const emailError = validateEmail(fields.email);
+  if (emailError) errors.email = emailError;
+
+  if (!fields.password) errors.password = 'Password is required.';
+
+  if (!fields.email.trim() || !fields.password) {
+    errors.form = 'Please complete all fields before signing in.';
+  }
+
+  return errors;
+}
+
 export function hasValidationErrors(errors: FieldErrors): boolean {
   return Boolean(errors.email || errors.password || errors.confirmPassword || errors.form);
 }
@@ -63,6 +83,12 @@ export function mapAuthError(message: string): string {
   const lower = message.toLowerCase();
   if (lower.includes('already registered') || lower.includes('already been registered')) {
     return 'This email is already registered. Try signing in instead.';
+  }
+  if (lower.includes('invalid login credentials') || lower.includes('invalid credentials')) {
+    return 'Email or password is incorrect.';
+  }
+  if (lower.includes('email not confirmed')) {
+    return 'Confirm your email before signing in. Check your inbox for a verification link.';
   }
   if (lower.includes('invalid email')) {
     return 'Enter a valid email address.';

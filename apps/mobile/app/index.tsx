@@ -19,7 +19,7 @@ export default function Index() {
     return <Redirect href="/welcome" />;
   }
 
-  return <Redirect href="/sign-up" />;
+  return <Redirect href="/sign-in" />;
 }
 
 const styles = StyleSheet.create({

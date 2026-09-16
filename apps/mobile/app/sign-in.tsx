@@ -14,21 +14,20 @@ import { AuthTextInput } from '../components/AuthTextInput';
 import { colors, spacing } from '../lib/theme';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
 import {
-  validateSignUpForm,
+  validateSignInForm,
   hasValidationErrors,
   mapAuthError,
   type FieldErrors,
 } from '../lib/validation';
 
-export default function SignUpScreen() {
+export default function SignInScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [submitting, setSubmitting] = useState(false);
 
-  async function handleSignUp() {
-    const errors = validateSignUpForm({ email, password, confirmPassword });
+  async function handleSignIn() {
+    const errors = validateSignInForm({ email, password });
     setFieldErrors(errors);
     if (hasValidationErrors(errors)) return;
 
@@ -42,7 +41,7 @@ export default function SignUpScreen() {
     setSubmitting(true);
     setFieldErrors({});
 
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email: email.trim(),
       password,
     });
@@ -56,11 +55,7 @@ export default function SignUpScreen() {
 
     if (data.session) {
       router.replace('/welcome');
-      return;
     }
-
-    // Email confirmation enabled — account created, session pending verification
-    router.replace('/welcome');
   }
 
   return (
@@ -72,9 +67,9 @@ export default function SignUpScreen() {
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={styles.title}>Create your SlipIQ account</Text>
+        <Text style={styles.title}>Sign in to SlipIQ</Text>
         <Text style={styles.subtitle}>
-          Sign up to access bet intelligence, scores, and analysis.
+          Sign in to access bet intelligence, scores, and analysis.
         </Text>
 
         {fieldErrors.form ? (
@@ -100,41 +95,26 @@ export default function SignUpScreen() {
           onChangeText={setPassword}
           error={fieldErrors.password}
           secureTextEntry
-          textContentType="newPassword"
-          autoComplete="new-password"
-          placeholder="Min 8 chars, letters, numbers, symbol"
-        />
-
-        <AuthTextInput
-          label="Confirm password"
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          error={fieldErrors.confirmPassword}
-          secureTextEntry
-          textContentType="newPassword"
-          autoComplete="new-password"
-          placeholder="Re-enter your password"
+          textContentType="password"
+          autoComplete="password"
+          placeholder="Enter your password"
         />
 
         <Pressable
           style={[styles.button, submitting && styles.buttonDisabled]}
-          onPress={handleSignUp}
+          onPress={handleSignIn}
           disabled={submitting}
         >
           {submitting ? (
             <ActivityIndicator color={colors.textPrimary} />
           ) : (
-            <Text style={styles.buttonText}>Sign up</Text>
+            <Text style={styles.buttonText}>Sign in</Text>
           )}
         </Pressable>
 
-        <Text style={styles.hint}>
-          Password must be at least 8 characters and include letters, numbers, and a symbol.
-        </Text>
-
-        <Pressable style={styles.switchAuth} onPress={() => router.push('/sign-in')}>
+        <Pressable style={styles.switchAuth} onPress={() => router.push('/sign-up')}>
           <Text style={styles.hint}>
-            Already have an account? <Text style={styles.link}>Sign in</Text>
+            Don&apos;t have an account? <Text style={styles.link}>Sign up</Text>
           </Text>
         </Pressable>
       </ScrollView>
@@ -179,15 +159,14 @@ const styles = StyleSheet.create({
   },
   buttonDisabled: { opacity: 0.7 },
   buttonText: { color: colors.textPrimary, fontSize: 16, fontWeight: '700' },
+  switchAuth: {
+    marginTop: spacing.md,
+  },
   hint: {
     color: colors.textSecondary,
     fontSize: 12,
     lineHeight: 18,
-    marginTop: spacing.md,
     textAlign: 'center',
-  },
-  switchAuth: {
-    marginTop: spacing.sm,
   },
   link: {
     color: colors.accent,

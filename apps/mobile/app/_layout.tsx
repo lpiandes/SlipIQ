@@ -16,6 +16,7 @@ export default function RootLayout() {
         }}
       >
         <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="sign-in" options={{ title: 'Sign in' }} />
         <Stack.Screen name="sign-up" options={{ title: 'Create account' }} />
         <Stack.Screen name="welcome" options={{ title: 'Welcome', headerBackVisible: false }} />
       </Stack>

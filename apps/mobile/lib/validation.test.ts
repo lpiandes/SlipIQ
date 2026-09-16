@@ -5,6 +5,7 @@ import {
   validatePassword,
   validateConfirmPassword,
   validateSignUpForm,
+  validateSignInForm,
   mapAuthError,
 } from './validation';
 
@@ -52,8 +53,28 @@ describe('validateSignUpForm', () => {
   });
 });
 
+describe('validateSignInForm', () => {
+  it('flags incomplete form', () => {
+    const errors = validateSignInForm({ email: '', password: '' });
+    assert.ok(errors.form);
+    assert.ok(errors.email);
+    assert.ok(errors.password);
+  });
+
+  it('accepts email and password without signup strength rules', () => {
+    const errors = validateSignInForm({ email: 'user@example.com', password: 'short' });
+    assert.equal(errors.form, undefined);
+    assert.equal(errors.email, undefined);
+    assert.equal(errors.password, undefined);
+  });
+});
+
 describe('mapAuthError', () => {
   it('maps duplicate email', () => {
     assert.match(mapAuthError('User already registered'), /already registered/i);
+  });
+
+  it('maps invalid login credentials', () => {
+    assert.equal(mapAuthError('Invalid login credentials'), 'Email or password is incorrect.');
   });
 });
